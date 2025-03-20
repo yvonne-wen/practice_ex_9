@@ -1,4 +1,37 @@
+import java.util.ArrayList;
 import java.util.Scanner;
+
+
+class CustomPizza {
+    private String toppings;
+    private double price;
+
+    public CustomPizza(String toppings, double price) {
+        this.toppings = toppings;
+        this.price = price;
+    }
+
+    public String getToppings() {
+        return toppings;
+    }
+
+    public void setToppings(String toppings) {
+        this.toppings = toppings;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
+    }
+
+    @Override
+    public String toString() {
+        return "CustomPizza [toppings=" + toppings + ", price=" + price + "]";
+    }
+}
 
 public class HandleOrders {
 
@@ -11,8 +44,9 @@ public class HandleOrders {
     private double totalOrderPrice = 0.0;
     private int numberOfPizzasOrdered = 0;
     StringBuilder pizzaOrderSummary = new StringBuilder();
-
     Scanner input = new Scanner(System.in);
+
+    private ArrayList<CustomPizza> customPizzas = new ArrayList<>();
 
     public void takeOrder(){
         String orderAnother = "Y";
@@ -77,7 +111,7 @@ public class HandleOrders {
                         break;
                 }
             } else if (choice == 6){
-                double customPizzaPrice = 0;
+                StringBuilder toppingsBuilder = new StringBuilder();
                 
                 System.out.println("For your custom pizza, here are the toppings:");
                 int k = 1;
@@ -87,8 +121,8 @@ public class HandleOrders {
                 }
                 System.out.println("Please enter a maximum of 10 topping choices.\n");
 
-                StringBuilder customPizza = new StringBuilder(" Custom Pizza with ");
                 
+
                 int l = 1;
                 do{
                     System.out.println("Enter topping #" + l + ". To stop, type 0: ");
@@ -97,14 +131,23 @@ public class HandleOrders {
                     if(toppingChoice == 0){
                         break;
                     }
-                    customPizza.append(PizzaToppings.values()[toppingChoice-1].getTopping() + ", ");
-                    customPizzaPrice += PizzaToppings.values()[toppingChoice-1].getToppingPrice();
-                    l++;
-                }while(l!=10 || l!=0);
+                    toppingsBuilder.append(PizzaToppings.values()[toppingChoice - 1].getTopping() + ", ");
+                } while (l < 10);
+          
+                double customPizzaPrice = PIZZA_BASE_PRICE;
+                for (int toppingIndex = 0; toppingIndex < toppingsBuilder.length(); toppingIndex++) {
+                    customPizzaPrice += PizzaToppings.values()[toppingIndex].getToppingPrice();
+                }
+                CustomPizza customPizza = new CustomPizza(toppingsBuilder.toString(), customPizzaPrice);
+                customPizzas.add(customPizza);
+
+
+                   
                 
                 customPizzaPrice += PIZZA_BASE_PRICE;
-                
-                customPizza.append(": €" + customPizzaPrice);
+                StringBuilder customPizzaStr = new StringBuilder(" Custom Pizza with ");
+                customPizzaStr.append(toppingsBuilder).append(": €").append(customPizzaPrice);
+            
 
                 pizzasOrdered[j] = customPizza.toString();
                 totalOrderPrice += customPizzaPrice;
@@ -189,5 +232,127 @@ public class HandleOrders {
         
         return pizzaOrderSummary.toString();
     }
+    public void displayCustomPizzas() {
+        for (CustomPizza pizza : customPizzas) {
+            System.out.println(pizza);
+        }
+    }
+
+    public static void main(String[] args) throws Exception {
+        HandleOrders handleOrders = new HandleOrders();
+        handleOrders.takeOrder();
+        handleOrders.displayCustomPizzas();
+        handleOrders.createOrderSummary();
+        System.out.println(handleOrders);
+    }
+}
+
+
+enum PizzaSelection {
+    PEPPERONI(12.0),
+    HAWAIIAN(13.0),
+    VEGGIE(11.0),
+    BBQ_CHICKEN(14.0),
+    EXTRAVAGANZA(15.0);
+
+    private double price;
+
+    PizzaSelection(double price) {
+        this.price = price;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+}
+
+enum PizzaToppings {
+    CHEESE(2.0),
+    PEPPERONI(3.0),
+    MUSHROOM(2.5),
+    ONION(2.0);
+
+    private double toppingPrice;
+
+    PizzaToppings(double toppingPrice) {
+        this.toppingPrice = toppingPrice;
+    }
+
+    public double getToppingPrice() {
+        return toppingPrice;
+    }
+
+    public String getTopping() {
+        return name();
+    }
+}
+
+enum PizzaSize {
+    SMALL("Small", 1.0),
+    MEDIUM("Medium", 2.0),
+    LARGE("Large", 3.0);
+
+    private String pizzaSize;
+    private double addToPizzaPrice;
+
+    PizzaSize(String pizzaSize, double addToPizzaPrice) {
+        this.pizzaSize = pizzaSize;
+        this.addToPizzaPrice = addToPizzaPrice;
+    }
+
+    public String getPizzaSize() {
+        return pizzaSize;
+    }
+
+    public double getAddToPizzaPrice() {
+        return addToPizzaPrice;
+    }
+}
+
+enum SideDish {
+    FRIES("French Fries", 4.0),
+    WINGS("Chicken Wings", 6.0),
+    GARLIC_BREAD("Garlic Bread", 3.0),
+    ONION_RINGS("Onion Rings", 5.0);
+
+    private String sideDishName;
+    private double addToPizzaPrice;
+
+    SideDish(String sideDishName, double addToPizzaPrice) {
+        this.sideDishName = sideDishName;
+        this.addToPizzaPrice = addToPizzaPrice;
+    }
+
+    public String getSideDishName() {
+        return sideDishName;
+    }
+
+    public double getAddToPizzaPrice() {
+        return addToPizzaPrice;
+    }
+}
+
+enum Drinks {
+    COKE("Coke", 2.0),
+    SPRITE("Sprite", 2.0),
+    ORANGE_JUICE("Orange Juice", 3.0);
+
+    private String drinkName;
+    private double addToPizzaPrice;
+
+    Drinks(String drinkName, double addToPizzaPrice) {
+        this.drinkName = drinkName;
+        this.addToPizzaPrice = addToPizzaPrice;
+    }
+
+    public String getDrinkName() {
+        return drinkName;
+    }
+
+    public double getAddToPizzaPrice() {
+        return addToPizzaPrice;
+    }
+
+
     
 }
